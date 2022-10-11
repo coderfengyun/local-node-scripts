@@ -1,4 +1,5 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
+import { Codec } from "@polkadot/types-codec/types";
 import { hexToNumber, hexToU8a } from "@polkadot/util";
 
 const ENDPOINT = "ws://localhost:9944/ws";
@@ -10,7 +11,7 @@ async function main() {
 
 async function state_call_ad_cal_reward() {
     let api = await createApi();
-    let res = await api.call.adRuntimeApi.calReward("0xbfd45ecbd972a88ab3cc15f858015e82456bf22916db11c9f073f003759dddfc", 42, "0x5df7305540f04f4b99cb911593e334df531d53a6", );
+    let res = await api.call.adRuntimeApi.calReward("0xbfd45ecbd972a88ab3cc15f858015e82456bf22916db11c9f073f003759dddfc", 42, "0x5df7305540f04f4b99cb911593e334df531d53a6", null);
     console.log(`res is ${res.toHuman()}`);
 }
 
@@ -91,11 +92,11 @@ async function createApi(): Promise<ApiPromise> {
                             params: [
                                 {
                                     name: 'ad_id',
-                                    type: 'Hash',
+                                    type: 'H256',
                                 },
                                 {
                                     name: 'nft_id',
-                                    type: 'u64',
+                                    type: 'u32',
                                 },
                                 {
                                     name: 'visitor',
@@ -104,7 +105,7 @@ async function createApi(): Promise<ApiPromise> {
                                 {
                                     name: 'referrer',
                                     type: 'Option<H160>',
-                                },
+                                }
                             ],
                             type: 'u128'
                         }
