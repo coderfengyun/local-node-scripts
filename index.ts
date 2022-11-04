@@ -1,12 +1,45 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { Codec } from "@polkadot/types-codec/types";
 import { hexToNumber, hexToU8a, formatBalance } from "@polkadot/util";
+import { assert } from "console";
 
-// const ENDPOINT = "ws://localhost:9944/ws";
-const ENDPOINT = "wss://rpc.parami.io/ws";
+const ENDPOINT = "ws://localhost:9944/ws";
+// const ENDPOINT = "wss://rpc.parami.io/ws";
 
 async function main() {
-    await asset_price_in_five_days();
+  checkNewStaking();
+}
+
+async function checkNewStaking() {
+   let api = await createApi();
+
+   let assetId = 3;
+   let account = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
+
+
+   let res = await api.query.stake.stakingActivityStore(assetId);
+   console.log(`result of stake activity of ${assetId} is ${JSON.stringify(res.toHuman(), undefined, 2)}`);
+
+   res = await api.query.stake.userStakingBalanceStore(assetId, account);
+   console.log(`result of balance is ${res.toHuman()}`);
+
+   res = await api.query.stake.userStakingRewardStore(assetId, account);
+   console.log(`result of reward is ${res.toHuman()}`);
+
+   res = await api.query.assets.account(assetId, account);
+   console.log(`result of asset account is ${JSON.stringify(res.toHuman(), undefined, 2)}`);
+
+   let resArray = await api.query.assets.asset.entries();
+   console.log(`result of assets.asset is ${JSON.stringify(resArray.map(t => t[0].toHuman()), undefined, 2)}`);
+
+   resArray = await api.query.swap.account.entries(account);
+   console.log(`result of swap.account is ${JSON.stringify(resArray.map(t => t[0].toHuman()), undefined, 2)}`);
+}
+
+async function didOf() {
+  let api = await createApi();
+  let res = await api.query.did.didOf("5EXU4ck6DXwmcwpbeW6j1upTFeuoHbzXiF23o6fHm4xhvkuC");
+  console.log(`result of didOf is ${res.toJSON()}`);
 }
 
 async function asset_price_in_five_days() {
@@ -63,15 +96,24 @@ async function state_call_account_nounce() {
 
 async function loadLinkEntries() {
     let apiWs = await createApi();
-    console.log("start searching");
-    const entries = await apiWs.query.linker.linksOf.entries();
-    console.log("loaded all entries");
-
-    entries.forEach(([{args: [did, network]}, value]) => {
+    console.log("start loading all entries");
+    const PAGE_SIZE = 50;
+    let last_key: string|undefined = "0xeff9e899844ad32fcaf1efb3ce8e842bc6af308cbe71b047400b4b0d341ead7a002521041a1b644d654bf451642f1d3f7889176cd195eca478deb3f087";
+    for(;;) {
+      const new_entries :any[] = await apiWs.query.linker.linksOf.entriesPaged({ args: [], pageSize: PAGE_SIZE, startKey: last_key });
+      new_entries.forEach(([{args: [did, network]}, value]) => {
         console.log("found: ", did.toHuman(), value.toHuman(), network.toHuman());
-    })
-
-    console.log("done searching");
+      });
+      console.log("finish one pass");
+      if (new_entries.length < PAGE_SIZE) {
+        console.log("done loop");
+        break;
+      }
+      console.log(`last entry is ${new_entries[new_entries.length - 1][0]}`);
+      last_key = new_entries[new_entries.length - 1][0].toString();
+      console.log(`new last_key is ${last_key}`);
+    }
+    console.log("loaded all entries");
 }
 
 async function createApi(): Promise<ApiPromise> {
