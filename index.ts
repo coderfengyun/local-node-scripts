@@ -102,16 +102,14 @@ async function loadLinkEntries() {
     for(;;) {
       const new_entries :any[] = await apiWs.query.linker.linksOf.entriesPaged({ args: [], pageSize: PAGE_SIZE, startKey: last_key });
       new_entries.forEach(([{args: [did, network]}, value]) => {
-        console.log("found: ", did.toHuman(), value.toHuman(), network.toHuman());
+        console.log(`${did.toHuman()}\t${value.toHuman()}\t${network.toHuman()}`);
       });
-      console.log("finish one pass");
+
       if (new_entries.length < PAGE_SIZE) {
-        console.log("done loop");
         break;
       }
-      console.log(`last entry is ${new_entries[new_entries.length - 1][0]}`);
-      last_key = new_entries[new_entries.length - 1][0].toString();
-      console.log(`new last_key is ${last_key}`);
+
+      last_key = new_entries[new_entries.length - 1][0].toString(); 
     }
     console.log("loaded all entries");
 }
