@@ -10,16 +10,12 @@
     },
     "dependencies": {
         "@ethersproject/hash": "^5.7.0",
-        "@polkadot/api": "^8",
-        "@polkadot/keyring": "^10.1.12",
-        "as-scale-codec": "^0.2.3",
+        "@polkadot/api": "^9.9.1",
         "csv-parse": "^5.3.2",
         "csv-parser": "^3.0.0",
         "eth-sign-verify": "0.0.6",
         "ethers": "^5.7.2",
-        "i": "^0.3.7",
         "npm": "^8.19.3",
-        "parity-scale-codec": "^0.4.2",
         "spinnies": "^0.5.1"
     },
     "devDependencies": {

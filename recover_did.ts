@@ -8,8 +8,6 @@ import { parse } from 'csv-parse';
 import { ethers } from "ethers";
 import config from "./config.json"
 import * as fs from 'fs';
-import { stringUnion } from "parity-scale-codec";
-
 // import from "csv-parser";
 
 const ENDPOINT = "ws://localhost:9944/ws";
